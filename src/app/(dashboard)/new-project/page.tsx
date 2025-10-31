@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { NewProjectForm } from "@/components/project/new-project-form";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
   title: "VECTOR | Lanzar nueva misión",
@@ -8,23 +9,32 @@ export const metadata: Metadata = {
 
 export default function NewProjectPage() {
   return (
-    <main className="relative mx-auto w-full max-w-7xl px-6 py-14 sm:px-10">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.15),transparent_55%)]" />
-      <div className="flex flex-col gap-12">
-        <header className="space-y-4">
-          <div className="inline-flex items-center gap-3 rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs uppercase tracking-[0.35em] text-primary">
-            Vector · Mission Control
+    <main className="flex h-screen w-full flex-col bg-background">
+      <header className="flex items-center justify-between border-b border-border/60 bg-card/80 px-6 py-4">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-primary">
+            <span className="h-2 w-2 rounded-full bg-primary" /> Vector
           </div>
-          <h1 className="text-3xl font-semibold leading-tight md:text-4xl lg:text-5xl">
-            Diseña la misión, programa a los agentes y lanza tu proyecto con momentum.
-          </h1>
-          <p className="max-w-2xl text-base text-muted-foreground">
-            Vector sincroniza agentes especializados para convertir tus hipótesis en un sistema operativo de ejecución. Escribe la visión, el resto es timing perfecto, foco y claridad accionable.
+          <div className="h-5 w-px bg-border/40" />
+          <p className="text-xs font-medium uppercase tracking-[0.32em] text-muted-foreground">
+            Mission Console · Nueva misión
           </p>
-        </header>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="border-border/60 bg-background/80 text-xs font-medium uppercase tracking-[0.2em]">
+            Workspace Activo
+          </Badge>
+          <Badge variant="outline" className="border-amber-400/40 bg-amber-400/10 text-[10px] font-semibold uppercase tracking-[0.28em] text-amber-400">
+            Estado: Configuración
+          </Badge>
+        </div>
+      </header>
 
-        <NewProjectForm />
-      </div>
+      <section className="flex flex-1 overflow-hidden px-4 py-4 sm:px-6 sm:py-6 lg:px-10">
+        <div className="flex h-full w-full overflow-hidden rounded-2xl border border-border/50 bg-card/70 shadow-[0_24px_90px_-60px_rgba(0,0,0,0.75)]">
+          <NewProjectForm />
+        </div>
+      </section>
     </main>
   );
 }
