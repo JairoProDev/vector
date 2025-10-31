@@ -396,7 +396,14 @@ function RoadmapEditor({
             onChange={(event) => onChange({ ...value, markdown: event.target.value })}
           />
           <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/40 p-4 prose prose-sm max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{value.markdown}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {value.markdown.length > 12000 ? `${value.markdown.slice(0, 12000)}\n\n…` : value.markdown}
+            </ReactMarkdown>
+          </div>
+          <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/40 p-4 prose prose-sm max-w-none">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {value.markdown.length > 12000 ? `${value.markdown.slice(0, 12000)}\n\n…` : value.markdown}
+            </ReactMarkdown>
           </div>
         </CardContent>
       </Card>
