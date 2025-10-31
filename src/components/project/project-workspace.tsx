@@ -43,6 +43,11 @@ export function ProjectWorkspace({ project }: { project: ProjectPayload }) {
                 <Badge variant="outline" className="border-border/60 text-muted-foreground">
                   Playbook: {project.playbookId}
                 </Badge>
+            {project.provider === "vector-demo" && (
+              <Badge variant="outline" className="border-amber-400/70 bg-amber-500/10 text-amber-400">
+                Demo orquestada
+              </Badge>
+            )}
               </div>
               <CardTitle className="text-2xl font-semibold leading-tight">
                 {project.idea}

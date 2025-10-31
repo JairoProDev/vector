@@ -233,6 +233,11 @@ export function NewProjectForm() {
             <CardDescription className="text-xs">
               Controla parámetros clave antes de lanzar la orquestación.
             </CardDescription>
+            {isDemoMode && (
+              <Badge variant="outline" className="w-fit border-amber-400/70 bg-amber-500/10 text-[10px] font-semibold uppercase tracking-[0.34em] text-amber-400">
+                Demo instantánea
+              </Badge>
+            )}
           </CardHeader>
           <CardContent className="grid gap-3 text-xs text-muted-foreground">
             <div className="rounded-lg border border-border/40 bg-card/80 px-3 py-2">
