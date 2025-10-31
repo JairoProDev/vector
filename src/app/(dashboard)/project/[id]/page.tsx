@@ -1,0 +1,37 @@
+import { notFound } from "next/navigation";
+
+import { ProjectWorkspace } from "@/components/project/project-workspace";
+import { getAuthSession } from "@/lib/auth";
+import { connectToDatabase } from "@/lib/db";
+import { ProjectModel } from "@/lib/models/project";
+import { toProjectPayload } from "@/lib/serializers/project";
+
+interface ProjectPageProps {
+  params: { id: string };
+}
+
+export default async function ProjectPage({ params }: ProjectPageProps) {
+  const session = await getAuthSession();
+  await connectToDatabase();
+
+  const projectDoc = await ProjectModel.findById(params.id);
+
+  if (!projectDoc) {
+    notFound();
+  }
+
+  if (!canAccessProject(session?.user?.id, projectDoc.userId)) {
+    notFound();
+  }
+
+  const project = toProjectPayload(projectDoc);
+
+  return <ProjectWorkspace project={project} />;
+}
+
+function canAccessProject(userId?: string, projectUserId?: string | null) {
+  if (!projectUserId) return true;
+  if (!userId) return false;
+  return userId === projectUserId;
+}
+
