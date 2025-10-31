@@ -46,6 +46,17 @@ Todo en **menos de 90 segundos**.
 
 ## 🚀 Getting Started
 
+### Quick Start (Mock Mode - No API Keys Required!)
+
+Para demos, hackathons o pruebas rápidas:
+
+```bash
+npm install
+npm run dev
+```
+
+**¡Listo!** La app funciona automáticamente con datos mock si no hay MongoDB o API keys configuradas.
+
 ### 1. Instalación
 
 ```bash
@@ -55,6 +66,15 @@ npm install
 
 ### 2. Configuración de Variables de Entorno
 
+#### Opción A: Modo Mock (Recomendado para empezar)
+No necesitas crear `.env.local`. La app detecta automáticamente si faltan credenciales y usa datos de demostración.
+
+Para forzar modo mock explícitamente, crea `.env.local`:
+```bash
+VECTOR_USE_MOCK_ORCHESTRATOR=true
+```
+
+#### Opción B: Modo Producción (Con IA real)
 Crea un archivo `.env.local` en la raíz del proyecto:
 
 ```bash
@@ -192,7 +212,25 @@ npm run build
 vercel deploy
 ```
 
-No olvides configurar las variables de entorno en el dashboard de Vercel.
+⚠️ **IMPORTANTE**: Si despliegas en un subdirectorio (ej: `yoursite.com/vector`):
+
+1. En Vercel → Settings → Environment Variables
+2. Agrega: `NEXT_PUBLIC_BASE_PATH=/vector`
+3. Redeploy
+
+Ver [DEPLOYMENT.md](./DEPLOYMENT.md) para más detalles.
+
+**Variables de entorno mínimas para Vercel:**
+```bash
+# Para modo demo (sin API keys)
+VECTOR_USE_MOCK_ORCHESTRATOR=true
+
+# O para producción con IA
+OPENAI_API_KEY=sk-proj-...
+MONGODB_URI=mongodb+srv://...
+NEXTAUTH_SECRET=your-random-secret
+NEXTAUTH_URL=https://yoursite.com
+```
 
 ---
 
