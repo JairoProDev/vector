@@ -5,15 +5,35 @@ import { getAuthSession } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { ProjectModel } from "@/lib/models/project";
 import { runOrchestrator } from "@/lib/orchestrator";
+import {
+  createMockProject,
+  shouldUseMockOrchestrator,
+  storeMockProject,
+} from "@/lib/orchestrator/mock";
 import { toProjectPayload } from "@/lib/serializers/project";
 import { generateProjectSchema } from "@/lib/validators/project";
-
 export async function POST(request: Request) {
   try {
     const json = await request.json();
     const body = generateProjectSchema.parse(json);
 
     const session = await getAuthSession();
+
+    if (shouldUseMockOrchestrator()) {
+      const project = createMockProject({
+        idea: body.idea,
+        projectType: body.projectType,
+        userId: session?.user?.id ?? null,
+      });
+      storeMockProject(project);
+      if (process.env.NODE_ENV !== "production") {
+        console.info("[Vector] ▶️ Generador (mock) ejecutado", {
+          projectId: project.id,
+          mode: "mock",
+        });
+      }
+      return NextResponse.json({ project }, { status: 201 });
+    }
 
     await connectToDatabase();
 

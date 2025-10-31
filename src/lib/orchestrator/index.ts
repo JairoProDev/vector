@@ -51,6 +51,11 @@ export async function runOrchestrator(
     logEntry.status = "running";
     logEntry.startedAt = new Date().toISOString();
 
+    console.info(
+      "[Vector] ▶️ Ejecutando agente",
+      JSON.stringify({ id: agent.id, label: agent.label, provider: activeProvider }),
+    );
+
     try {
       validateDependencies(agent.dependsOn, context.artifacts);
 
@@ -72,6 +77,11 @@ export async function runOrchestrator(
       logEntry.provider = result.provider;
       logEntry.model = result.model;
       logEntry.finishedAt = new Date().toISOString();
+
+      console.info(
+        "[Vector] ✅ Agente completado",
+        JSON.stringify({ id: agent.id, provider: result.provider, model: result.model }),
+      );
     } catch (error) {
       logEntry.status = "error";
       logEntry.error =
@@ -79,6 +89,10 @@ export async function runOrchestrator(
           ? error.message
           : "Unexpected orchestrator error";
       logEntry.finishedAt = new Date().toISOString();
+      console.error(
+        "[Vector] ❌ Agente con error",
+        JSON.stringify({ id: agent.id, message: logEntry.error }),
+      );
       throw error;
     }
   }
