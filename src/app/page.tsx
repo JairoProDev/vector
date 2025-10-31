@@ -19,11 +19,6 @@ import {
   Workflow,
 } from "lucide-react";
 
-const signInPath = "/signin";
-const newProjectPath = "/new-project";
-const newProjectCallback = encodeURIComponent(newProjectPath);
-const signInWithNewProject = `${signInPath}?callbackUrl=${newProjectCallback}`;
-
 const navItems = [
   { label: "Visión", href: "#vision" },
   { label: "Producto", href: "#producto" },
@@ -31,6 +26,14 @@ const navItems = [
   { label: "Precios", href: "#precios" },
   { label: "Preguntas", href: "#faq" },
 ];
+
+const rawBasePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "");
+const withBasePath = (path: string) => `${rawBasePath}${path}`;
+
+const signInPath = withBasePath("/signin");
+const newProjectPath = withBasePath("/new-project");
+const newProjectCallback = encodeURIComponent(newProjectPath);
+const signInWithNewProject = `${signInPath}?callbackUrl=${newProjectCallback}`;
 
 const differentiators = [
   {
@@ -291,7 +294,7 @@ export default function Home() {
               El primer sistema operativo que reduce el costo de comenzar un proyecto de infinito a cero
             </h1>
             <p className="text-lg text-muted-foreground md:text-xl">
-              Vector interpreta tu idea, activa un equipo de agentes de IA y entrega el plan accionable que necesitas para validar en el mundo real. No es otro espacio de notas; es la torre de control que orquesta estrategia, ejecución e inteligencia.
+              Vector interpreta tu idea, activa un equipo de agentes de IA y entrega el plan accionable que necesitas para validar en el mundo real. Entra como invitado en segundos y, cuando quieras guardar tu progreso, conecta tu cuenta con Google o GitHub.
             </p>
           </div>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -617,7 +620,7 @@ export default function Home() {
               Vector es el sistema nervioso central de la innovación. Comienza hoy.
             </h2>
             <p className="text-lg text-muted-foreground">
-              Conecta con Google o GitHub, importa tu contexto y lanza tu misión inicial en minutos. Nuestro copiloto te guía fuera de la pantalla para validar y regresar con evidencia que evoluciona tu estrategia.
+              Lanza tu primera misión como invitado o conecta con Google y GitHub para mantener un registro permanente. El copiloto te guía fuera de la pantalla para validar y regresar con evidencia que evoluciona tu estrategia.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Link
@@ -649,7 +652,7 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
             <Link href="mailto:founders@vector.so">Contacto</Link>
             <span>·</span>
-            <Link href="/signin">Acceso clientes</Link>
+            <Link href={signInPath}>Acceso clientes</Link>
             <span>·</span>
             <span>© {new Date().getFullYear()} Vector Technologies.</span>
           </div>

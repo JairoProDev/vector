@@ -112,8 +112,14 @@ function extractJsonPayload(text: string) {
   const trimmed = text.trim();
   
   // Try direct JSON first
-  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-    return trimmed;
+  if (trimmed.startsWith("{")) {
+    const lastBraceIndex = trimmed.lastIndexOf("}");
+    if (lastBraceIndex !== -1) {
+      const candidate = trimmed.slice(0, lastBraceIndex + 1);
+      if (candidate.trim().startsWith("{") && candidate.trim().endsWith("}")) {
+        return candidate.trim();
+      }
+    }
   }
 
   // Try to extract JSON from code blocks (```json or ```)
@@ -123,9 +129,10 @@ function extractJsonPayload(text: string) {
   }
 
   // Try to find JSON object anywhere in the text (non-greedy with dotall)
-  const match = trimmed.match(/\{[\s\S]*?\}/);
-  if (match && match[0]) {
-    return match[0];
+  const firstBrace = trimmed.indexOf("{");
+  const lastBrace = trimmed.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    return trimmed.slice(firstBrace, lastBrace + 1);
   }
 
   throw new Error("LLM response did not include a JSON object");
