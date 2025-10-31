@@ -1,11 +1,16 @@
-import { ProjectWorkspaceClient } from "@/components/project/project-workspace-client";
+import dynamic from "next/dynamic";
+
+// HACKATHON MODE: Disable SSR completely to use localStorage
+const ProjectWorkspaceClient = dynamic(
+  () => import("@/components/project/project-workspace-client").then((mod) => mod.ProjectWorkspaceClient),
+  { ssr: false }
+);
 
 interface ProjectPageProps {
   params: { id: string };
 }
 
 export default function ProjectPage({ params }: ProjectPageProps) {
-  // HACKATHON MODE: Use client-side component to read from localStorage
   return <ProjectWorkspaceClient projectId={params.id} />;
 }
 
