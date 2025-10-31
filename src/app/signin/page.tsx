@@ -12,7 +12,7 @@ export default function SignInPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <Card className="w-full max-w-md border-primary/20 shadow-xl">
         <CardHeader className="space-y-3 text-center">
-          <CardTitle className="text-2xl font-semibold">Inicia sesión en AcelerIA</CardTitle>
+          <CardTitle className="text-2xl font-semibold">Inicia sesión en Vector</CardTitle>
           <CardDescription>
             Conecta tu cuenta para guardar proyectos, iterar con el copiloto y retomar donde lo dejaste.
           </CardDescription>
@@ -42,7 +42,7 @@ export default function SignInPage() {
             Accede como invitado
           </Button>
           <Link href="/" className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary">
-            <ArrowLeft className="h-4 w-4" /> Volver a AcelerIA
+            <ArrowLeft className="h-4 w-4" /> Volver a Vector
           </Link>
         </CardContent>
       </Card>

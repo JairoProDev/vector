@@ -9,16 +9,16 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Genesis | AcelerIA - Orquestador de proyectos",
+  title: "VECTOR | Mission Orchestrator",
   description:
-    "AcelerIA Genesis transforma ideas en planes accionables con cadenas de agentes de IA y un panel de misión colaborativo.",
+    "VECTOR transforma ideas en planes accionables: coordina agentes de IA, genera artefactos estratégicos y te entrega una misión lista para ejecutar.",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" className="dark" suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background font-sans text-foreground",

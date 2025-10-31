@@ -101,7 +101,7 @@ export function CopilotPanel() {
             <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
               <MessageCircle className="h-10 w-10 text-primary/60" />
               <p>
-                ¿Por dónde quieres profundizar? Pregunta por riesgos, métricas, copy o experimentos. AcelerIA conoce en qué artefacto estás trabajando.
+                ¿Por dónde quieres profundizar? Pregunta por riesgos, métricas, copy o experimentos. Vector ya entiende el artefacto activo y mantiene el contexto.
               </p>
             </div>
           )}

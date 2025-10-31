@@ -3,24 +3,28 @@ import type { Metadata } from "next";
 import { NewProjectForm } from "@/components/project/new-project-form";
 
 export const metadata: Metadata = {
-  title: "AcelerIA | Crea tu proyecto",
+  title: "VECTOR | Lanzar nueva misión",
 };
 
 export default function NewProjectPage() {
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-16 sm:px-10">
-      <header className="max-w-3xl space-y-4">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-          AcelerIA · Orquestador de proyectos
-        </p>
-        <h1 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl md:text-5xl">
-          Desbloquea el día cero: de idea nebulosa a plan con momentum en minutos.
-        </h1>
-        <p className="text-base text-muted-foreground sm:text-lg">
-          Cuéntanos tu visión y deja que nuestro stack de agentes le dé forma. Mientras otros se quedan en la parálisis, tú sales con un plan listo para ejecutar.
-        </p>
-      </header>
-      <NewProjectForm />
+    <main className="relative mx-auto w-full max-w-7xl px-6 py-14 sm:px-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.15),transparent_55%)]" />
+      <div className="flex flex-col gap-12">
+        <header className="space-y-4">
+          <div className="inline-flex items-center gap-3 rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs uppercase tracking-[0.35em] text-primary">
+            Vector · Mission Control
+          </div>
+          <h1 className="text-3xl font-semibold leading-tight md:text-4xl lg:text-5xl">
+            Diseña la misión, programa a los agentes y lanza tu proyecto con momentum.
+          </h1>
+          <p className="max-w-2xl text-base text-muted-foreground">
+            Vector sincroniza agentes especializados para convertir tus hipótesis en un sistema operativo de ejecución. Escribe la visión, el resto es timing perfecto, foco y claridad accionable.
+          </p>
+        </header>
+
+        <NewProjectForm />
+      </div>
     </main>
   );
 }

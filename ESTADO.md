@@ -1,4 +1,4 @@
-# Estado del Proyecto AcelerIA Genesis
+# Estado del Proyecto VectorIA
 
 ## ✅ Completo y Funcional
 
@@ -61,4 +61,5 @@ El modelo Gemini 2.0 Flash a veces devuelve JSON con caracteres especiales que c
 **Versión**: 0.1.0 MVP
 **Estado**: ✅ Funcional para demos
 **Última actualización**: $(date)
+
 

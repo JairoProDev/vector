@@ -1,4 +1,4 @@
-# AcelerIA Genesis 🚀
+# VECTOR Mission Orchestrator 🚀
 
 **Orquestador de Proyectos con IA** - Transforma ideas nebulosas en planes accionables en minutos.
 
@@ -6,7 +6,7 @@
 
 ## 🎯 ¿Qué es?
 
-AcelerIA Genesis es un IDE (Integrated Development Environment) de **Estrategia de Proyectos**. Como Cursor es para código, Genesis es para **ideas, startups y emprendimientos**.
+Vector es un IDE (Integrated Development Environment) de **Estrategia de Proyectos**. Como Cursor es para código, Vector es para **ideas, startups y emprendimientos**.
 
 ### El Problema que Resolvemos
 
@@ -49,7 +49,7 @@ Todo en **menos de 90 segundos**.
 ### 1. Instalación
 
 ```bash
-cd genesis
+cd vector
 npm install
 ```
 
@@ -116,7 +116,7 @@ Abre [http://localhost:3000](http://localhost:3000)
 ## 📂 Estructura del Proyecto
 
 ```
-genesis/
+vector/
 ├── src/
 │   ├── app/                        # Next.js App Router
 │   │   ├── (dashboard)/            # Rutas protegidas
@@ -213,7 +213,7 @@ Por generación completa de proyecto:
 
 ### Autenticación
 
-En desarrollo, Genesis usa **Credential Provider** (email/name simple).  
+En desarrollo, VectorIA usa **Credential Provider** (email/name simple).  
 En producción, configura Google/GitHub OAuth en `auth.ts`.
 
 ---

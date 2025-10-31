@@ -1,4 +1,4 @@
-# 🚀 Guía Rápida - AcelerIA Genesis
+# 🚀 Guía Rápida - VectorIA
 
 ## ⚠️ IMPORTANTE: Ya está configurado
 
@@ -15,7 +15,7 @@ Para usar el producto ahora mismo:
 pkill -f "next dev"
 
 # 2. Inicia el servidor de nuevo
-cd genesis
+cd vector
 npm run dev
 
 # 3. Abre tu navegador en:

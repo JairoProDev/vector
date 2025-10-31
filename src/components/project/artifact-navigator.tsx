@@ -46,7 +46,7 @@ export function ArtifactNavigator() {
           Artefactos
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Navega entre los entregables generados por AcelerIA y personaliza cada sección.
+          Vector versiona automáticamente cada artefacto. Ajusta hipótesis, roadmap y narrativa sin perder contexto.
         </p>
       </div>
       <nav className="space-y-2">
@@ -58,10 +58,10 @@ export function ArtifactNavigator() {
             <Button
               key={item.key}
               type="button"
-              variant={isActive ? "default" : "ghost"}
+              variant="ghost"
               className={cn(
                 "group flex w-full flex-col items-start gap-1 rounded-xl border border-transparent p-4 text-left transition-all",
-                isActive && "border-primary bg-primary/10 text-primary-foreground",
+                isActive && "border-primary/60 bg-primary/10 text-primary",
                 !isActive && "border-transparent bg-transparent",
               )}
               onClick={() => selectArtifact(item.key)}

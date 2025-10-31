@@ -109,13 +109,7 @@ export function NewProjectForm() {
   const canSubmit = !loading && charactersUsed >= 10 && charactersUsed <= 1800;
 
   const startProgressAnimation = () => {
-    setStepStatuses([
-      "running",
-      "pending" as StepStatus,
-      "pending" as StepStatus,
-      "pending" as StepStatus,
-      "pending" as StepStatus,
-    ].map((status, index) => (index === 0 ? "running" : "idle")));
+    setStepStatuses(steps.map((_, index) => (index === 0 ? "running" : "idle")));
 
     timersRef.current = steps.slice(1).map((step, index) => {
       const timeoutId = window.setTimeout(() => {
@@ -196,7 +190,7 @@ export function NewProjectForm() {
   const StepIcon = useMemo(() => {
     return function StepStatusIcon({ status, icon: Icon }: { status: StepStatus; icon: StepConfig["icon"] }) {
       if (status === "success") {
-        return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+        return <CheckCircle2 className="h-4 w-4 text-primary" />;
       }
       if (status === "error") {
         return <AlertCircle className="h-4 w-4 text-destructive" />;
@@ -208,14 +202,70 @@ export function NewProjectForm() {
     };
   }, []);
 
+  const activeProjectType = projectTypes.find((item) => item.value === projectType)!;
+
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <Card className="shadow-lg">
+    <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)_320px]">
+      <div className="order-2 flex flex-col gap-4 xl:order-none">
+        <Card className="border border-primary/30 bg-card/80 backdrop-blur">
+          <CardHeader className="space-y-3">
+            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+              <span className="h-2 w-2 rounded-full bg-primary" /> Vector
+            </div>
+            <CardTitle className="text-lg font-semibold text-foreground">
+              Consola de Misión
+            </CardTitle>
+            <CardDescription>
+              Ajusta parámetros, lanza la cadena de agentes y monitorea el estado en tiempo real. Todo queda versionado en tu workspace VECTOR.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+        <Card className="border border-border/60 bg-card/70">
+          <CardHeader className="space-y-3">
+            <CardTitle className="text-sm">Telemetría</CardTitle>
+            <CardDescription className="text-xs leading-relaxed">
+              Cada carácter suma contexto. Vector asigna automáticamente tokens y agentes según el tipo de misión que seleccionas.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-xs text-muted-foreground">
+            <div className="flex items-center justify-between">
+              <span>Contexto introducido</span>
+              <Badge variant="outline" className={cn("border-primary/30 text-primary", charactersUsed > 1800 && "border-destructive/50 text-destructive")}>{charactersUsed}/1800</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Misión seleccionada</span>
+              <span className="rounded-md bg-secondary/60 px-2 py-1 text-secondary-foreground">
+                {activeProjectType.label}
+              </span>
+            </div>
+            <div className="flex items-start justify-between">
+              <span>Salida esperada</span>
+              <span className="text-right text-muted-foreground">
+                Lean Canvas · Roadmap · Pitch · Discovery
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border border-border/60 bg-card/70">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Manual de lanzamiento</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-xs text-muted-foreground">
+              <li>➤ Describe problema, usuario y resultados deseados.</li>
+              <li>➤ Selecciona misión inicial (nuevos tipos pronto).</li>
+              <li>➤ Vector compone agentes en cadena y versiona cada artefacto.</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="order-1 border border-border/60 bg-card/80 shadow-xl xl:order-none">
         <CardHeader className="gap-3">
           <Badge variant="secondary" className="w-fit">MVP Zero-to-One</Badge>
-          <CardTitle>Transforma tu idea en una misión accionable</CardTitle>
+          <CardTitle>Describe la misión que Vector debe ejecutar</CardTitle>
           <CardDescription>
-            AcelerIA orquesta agentes especializados para generar Lean Canvas, roadmap, pitch y plan de validación. Tú escribes la idea, nosotros despejamos el camino del día cero.
+            Vector orquesta agentes especializados para generar Lean Canvas, roadmap, pitch y discovery. Tú describes la visión, nosotros devolvemos el playbook accionable.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -225,7 +275,11 @@ export function NewProjectForm() {
                 <label htmlFor="idea" className="text-sm font-medium text-muted-foreground">
                   Describe tu idea
                 </label>
-                <span className={cn("text-xs", charactersUsed > 1800 ? "text-destructive" : "text-muted-foreground")}
+                <span
+                  className={cn(
+                    "text-xs",
+                    charactersUsed > 1800 ? "text-destructive" : "text-muted-foreground",
+                  )}
                 >
                   {charactersUsed}/1800
                 </span>
@@ -263,10 +317,10 @@ export function NewProjectForm() {
                       onClick={() => !item.comingSoon && setProjectType(item.value)}
                       disabled={item.comingSoon || loading}
                       className={cn(
-                        "flex h-full flex-col justify-between rounded-xl border p-3 text-left transition-all",
-                        "hover:border-primary/60 hover:shadow-md",
+                        "flex h-full flex-col justify-between rounded-2xl border border-border/60 bg-card/60 p-3 text-left transition-all",
+                        "hover:border-primary/60 hover:shadow-lg",
                         item.comingSoon && "cursor-not-allowed opacity-60",
-                        isActive && "border-primary bg-primary/5",
+                        isActive && "border-primary/80 bg-primary/10 shadow-lg",
                       )}
                     >
                       <div className="space-y-1.5">
@@ -276,8 +330,11 @@ export function NewProjectForm() {
                       {item.comingSoon ? (
                         <Badge variant="outline" className="mt-3 w-fit">Próximamente</Badge>
                       ) : (
-                        <Badge variant={isActive ? "default" : "outline"} className="mt-3 w-fit">
-                          {isActive ? "Seleccionado" : "Disponible"}
+                        <Badge
+                          variant={isActive ? "default" : "outline"}
+                          className={cn("mt-3 w-fit", isActive && "bg-primary text-primary-foreground")}
+                        >
+                          {isActive ? "Activa" : "Disponible"}
                         </Badge>
                       )}
                     </button>
@@ -294,16 +351,16 @@ export function NewProjectForm() {
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm text-muted-foreground">
-                Al generar aceptas que guardemos el proyecto para continuar iterando.
+                Al lanzar aceptas que Vector almacene esta iteración en tu workspace para futuras mejoras.
               </div>
               <Button type="submit" className="w-full sm:w-auto" disabled={!canSubmit}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Orquestando AcelerIA...
+                    Orquestando Vector...
                   </>
                 ) : (
-                  <>Generar proyecto</>
+                  <>Lanzar misión</>
                 )}
               </Button>
             </div>
@@ -311,11 +368,11 @@ export function NewProjectForm() {
         </CardContent>
       </Card>
 
-      <Card className="h-max border-primary/20 bg-primary/5">
+      <Card className="order-3 h-max border border-border/60 bg-card/80 shadow-lg xl:order-none">
         <CardHeader>
           <CardTitle className="text-base">Cadena de agentes</CardTitle>
           <CardDescription>
-            AcelerIA ejecuta esta secuencia para aterrizar tu visión en menos de 90 segundos.
+            Vector coordina esta secuencia para aterrizar tu visión en menos de 90 segundos.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -327,9 +384,9 @@ export function NewProjectForm() {
                 <div
                   key={step.id}
                   className={cn(
-                    "flex items-start gap-3 rounded-lg border border-transparent bg-card/60 p-3",
-                    status === "running" && "border-primary/30 bg-primary/10",
-                    status === "success" && "border-emerald-200 bg-emerald-50",
+                    "flex items-start gap-3 rounded-xl border border-border/60 bg-card/60 p-3",
+                    status === "running" && "border-primary/40 bg-primary/10",
+                    status === "success" && "border-primary/30 bg-primary/10",
                     status === "error" && "border-destructive/40 bg-destructive/10",
                   )}
                 >
