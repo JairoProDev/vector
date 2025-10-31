@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     return buildMockResponse(
       body,
       session?.user?.id ?? null,
-      "demo",
+      "demo-forced",
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
