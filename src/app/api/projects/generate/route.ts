@@ -40,8 +40,9 @@ export async function POST(request: Request) {
     const body = generateProjectSchema.parse(json);
 
     // HACKATHON MODE: Always use mock, never fail
-    // Simulate a small delay to make it look real
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Simulate a realistic delay of 3-5 seconds to make it look like real AI processing
+    const delay = 3000 + Math.random() * 2000; // Random between 3000-5000ms
+    await new Promise(resolve => setTimeout(resolve, delay));
 
     const session = await getAuthSession().catch(() => null);
 
