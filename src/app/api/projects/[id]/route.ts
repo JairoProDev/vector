@@ -4,8 +4,10 @@ import { z } from "zod";
 import { getAuthSession } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { ProjectModel } from "@/lib/models/project";
+import { getMockProject, shouldUseMockOrchestrator, updateMockProject } from "@/lib/orchestrator/mock";
 import { toProjectPayload } from "@/lib/serializers/project";
 import { updateProjectSchema } from "@/lib/validators/project";
+import type { ProjectPayload } from "@/types/project";
 
 const paramsSchema = z.object({
   id: z.string().min(1),
@@ -18,6 +20,23 @@ export async function GET(
   try {
     const { id } = paramsSchema.parse(context.params);
     const session = await getAuthSession();
+
+    // Check if ID is a UUID (mock project)
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    if (shouldUseMockOrchestrator() || isUUID) {
+      const mockProject = getMockProject(id);
+      if (!mockProject) {
+        return NextResponse.json({ message: "Proyecto no encontrado" }, { status: 404 });
+      }
+      if (!canAccessProject(session?.user?.id, mockProject.userId ?? null)) {
+        return NextResponse.json(
+          { message: "No tienes permisos para ver este proyecto" },
+          { status: 403 },
+        );
+      }
+      return NextResponse.json({ project: mockProject });
+    }
 
     await connectToDatabase();
     const project = await ProjectModel.findById(id);
@@ -58,6 +77,41 @@ export async function PUT(
     const { id } = paramsSchema.parse(context.params);
     const body = updateProjectSchema.parse(await request.json());
     const session = await getAuthSession();
+
+    // Check if ID is a UUID (mock project)
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    if (shouldUseMockOrchestrator() || isUUID) {
+      const mockProject = getMockProject(id);
+      if (!mockProject) {
+        return NextResponse.json({ message: "Proyecto no encontrado" }, { status: 404 });
+      }
+
+      if (!canAccessProject(session?.user?.id, mockProject.userId ?? null)) {
+        return NextResponse.json(
+          { message: "No tienes permisos para modificar este proyecto" },
+          { status: 403 },
+        );
+      }
+
+      // Update mock project
+      const updates: Partial<ProjectPayload> = {};
+      if (body.artifacts) {
+        updates.artifacts = {
+          leanCanvas: { ...mockProject.artifacts.leanCanvas, ...(body.artifacts.leanCanvas ?? {}) },
+          roadmap: {
+            summary: body.artifacts.roadmap?.summary ?? mockProject.artifacts.roadmap.summary,
+            markdown: body.artifacts.roadmap?.markdown ?? mockProject.artifacts.roadmap.markdown,
+            phases: body.artifacts.roadmap?.phases ?? mockProject.artifacts.roadmap.phases,
+          },
+          pitch: { ...mockProject.artifacts.pitch, ...(body.artifacts.pitch ?? {}) },
+          empathy: { ...mockProject.artifacts.empathy, ...(body.artifacts.empathy ?? {}) },
+        };
+      }
+
+      const updatedProject = updateMockProject(id, updates);
+      return NextResponse.json({ project: updatedProject });
+    }
 
     await connectToDatabase();
     const project = await ProjectModel.findById(id);

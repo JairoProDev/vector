@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getAuthSession } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { ProjectModel } from "@/lib/models/project";
+import { getMockProject, shouldUseMockOrchestrator } from "@/lib/orchestrator/mock";
 import { resolveModelName, resolveProvider } from "@/lib/llm/providers";
 import type { ArtifactKey, ProjectArtifacts } from "@/types/project";
 
@@ -27,34 +28,63 @@ export async function POST(request: Request) {
     const body = chatSchema.parse(await request.json());
     const session = await getAuthSession();
 
-    await connectToDatabase();
-    const project = await ProjectModel.findById(body.projectId);
+    // Check if ID is a UUID (mock project)
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.projectId);
 
-    if (!project) {
-      return NextResponse.json({ message: "Proyecto no encontrado" }, { status: 404 });
+    let projectData: { idea: string; provider: string; artifacts: ProjectArtifacts; userId: string | null };
+
+    if (shouldUseMockOrchestrator() || isUUID) {
+      const mockProject = getMockProject(body.projectId);
+      if (!mockProject) {
+        return NextResponse.json({ message: "Proyecto no encontrado" }, { status: 404 });
+      }
+
+      if (!canAccessProject(session?.user?.id, mockProject.userId ?? null)) {
+        return NextResponse.json(
+          { message: "No puedes conversar sobre este proyecto" },
+          { status: 403 },
+        );
+      }
+
+      projectData = {
+        idea: mockProject.idea,
+        provider: mockProject.provider,
+        artifacts: mockProject.artifacts,
+        userId: mockProject.userId ?? null,
+      };
+    } else {
+      await connectToDatabase();
+      const project = await ProjectModel.findById(body.projectId);
+
+      if (!project) {
+        return NextResponse.json({ message: "Proyecto no encontrado" }, { status: 404 });
+      }
+
+      if (!canAccessProject(session?.user?.id, project.userId)) {
+        return NextResponse.json(
+          { message: "No puedes conversar sobre este proyecto" },
+          { status: 403 },
+        );
+      }
+
+      if (!project.artifacts) {
+        return NextResponse.json(
+          { message: "El proyecto todavía no tiene artefactos generados" },
+          { status: 400 },
+        );
+      }
+
+      projectData = {
+        idea: project.idea,
+        provider: project.provider ?? "openai",
+        artifacts: project.artifacts as ProjectArtifacts,
+        userId: project.userId,
+      };
     }
 
-    if (!canAccessProject(session?.user?.id, project.userId)) {
-      return NextResponse.json(
-        { message: "No puedes conversar sobre este proyecto" },
-        { status: 403 },
-      );
-    }
+    const systemPrompt = buildSystemPrompt(body.artifactKey, projectData.idea, projectData.artifacts);
 
-    if (!project.artifacts) {
-      return NextResponse.json(
-        { message: "El proyecto todavía no tiene artefactos generados" },
-        { status: 400 },
-      );
-    }
-
-    const artifacts = project.artifacts as ProjectArtifacts;
-    const systemPrompt = buildSystemPrompt(body.artifactKey, project.idea, artifacts);
-
-    const providerFallback = (project.provider ?? "openai") as
-      | "openai"
-      | "anthropic"
-      | "google";
+    const providerFallback = projectData.provider as "openai" | "anthropic" | "google";
     const { provider, getModel } = resolveProvider(body.provider ?? providerFallback);
     const modelName = resolveModelName(provider, body.model);
 

@@ -14,7 +14,11 @@ interface ProjectPageProps {
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const session = await getAuthSession();
 
-  if (shouldUseMockOrchestrator()) {
+  // Check if ID is a UUID (mock project) instead of MongoDB ObjectId
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.id);
+
+  // Use mock if forced, or if ID is a UUID
+  if (shouldUseMockOrchestrator() || isUUID) {
     const mockProject = getMockProject(params.id);
     if (!mockProject) {
       notFound();

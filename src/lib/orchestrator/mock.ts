@@ -187,3 +187,17 @@ export function getMockProject(id: string) {
   return mockStore.get(id);
 }
 
+export function updateMockProject(id: string, updates: Partial<ProjectPayload>) {
+  const project = mockStore.get(id);
+  if (!project) return null;
+
+  const updatedProject = {
+    ...project,
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  };
+
+  mockStore.set(id, updatedProject);
+  return updatedProject;
+}
+
