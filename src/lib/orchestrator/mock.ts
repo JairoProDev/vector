@@ -187,4 +187,3 @@ export function getMockProject(id: string) {
   return mockStore.get(id);
 }
 
-
