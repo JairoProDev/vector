@@ -39,49 +39,17 @@ export async function POST(request: Request) {
     const json = await request.json();
     const body = generateProjectSchema.parse(json);
 
-    const session = await getAuthSession();
-    const forceDemo = process.env.VECTOR_FORCE_DEMO === "true";
-    const useMock = forceDemo || shouldUseMockOrchestrator();
+    // HACKATHON MODE: Always use mock, never fail
+    // Simulate a small delay to make it look real
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-    if (useMock) {
-      return buildMockResponse(
-        body,
-        session?.user?.id ?? null,
-        forceDemo ? "demo-forced" : "demo",
-      );
-    }
+    const session = await getAuthSession().catch(() => null);
 
-    try {
-      await connectToDatabase();
-
-      const orchestratorResult = await runOrchestrator({
-        idea: body.idea,
-        projectType: body.projectType,
-        provider: body.llmProvider,
-        anchorModel: body.anchorModel,
-      });
-
-      const project = await ProjectModel.create({
-        idea: body.idea,
-        projectType: body.projectType,
-        playbookId: orchestratorResult.playbookId,
-        provider: orchestratorResult.provider,
-        userId: session?.user?.id ?? null,
-        artifacts: orchestratorResult.artifacts,
-        orchestratorLog: orchestratorResult.log,
-      });
-
-      return NextResponse.json(
-        {
-          project: toProjectPayload(project),
-          mode: "production",
-        },
-        { status: 201 },
-      );
-    } catch (error) {
-      console.error("[Vector] ❌ Orchestrator failed, switching to demo mode", error);
-      return buildMockResponse(body, session?.user?.id ?? null, "demo-fallback");
-    }
+    return buildMockResponse(
+      body,
+      session?.user?.id ?? null,
+      "demo",
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

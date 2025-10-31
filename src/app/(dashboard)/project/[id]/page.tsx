@@ -12,34 +12,17 @@ interface ProjectPageProps {
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  const session = await getAuthSession();
+  // HACKATHON MODE: Always use mock, never connect to real DB
+  const session = await getAuthSession().catch(() => null);
 
-  if (shouldUseMockOrchestrator()) {
-    const mockProject = getMockProject(params.id);
-    if (!mockProject) {
-      notFound();
-    }
-    if (!canAccessProject(session?.user?.id, mockProject.userId ?? null)) {
-      notFound();
-    }
-    return <ProjectWorkspace project={mockProject} />;
-  }
-
-  await connectToDatabase();
-
-  const projectDoc = await ProjectModel.findById(params.id);
-
-  if (!projectDoc) {
+  const mockProject = getMockProject(params.id);
+  if (!mockProject) {
     notFound();
   }
-
-  if (!canAccessProject(session?.user?.id, projectDoc.userId)) {
+  if (!canAccessProject(session?.user?.id, mockProject.userId ?? null)) {
     notFound();
   }
-
-  const project = toProjectPayload(projectDoc);
-
-  return <ProjectWorkspace project={project} />;
+  return <ProjectWorkspace project={mockProject} />;
 }
 
 function canAccessProject(userId?: string, projectUserId?: string | null) {
