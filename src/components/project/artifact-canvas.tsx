@@ -55,6 +55,7 @@ export function ArtifactCanvas() {
   const lastError = useProjectStore((state) => state.lastError);
 
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
   if (!project) {
     return null;
@@ -67,6 +68,19 @@ export function ArtifactCanvas() {
 
     setSavingState("saving");
     setSaveMessage(null);
+
+    if (isDemoMode) {
+      window.setTimeout(() => {
+        markArtifactsSynced([selectedArtifact]);
+        setSavingState("saved");
+        setSaveMessage("Cambios guardados (modo demo)");
+        window.setTimeout(() => {
+          setSavingState("idle");
+          setSaveMessage(null);
+        }, 1500);
+      }, 350);
+      return;
+    }
 
     try {
       const response = await fetch(`/api/projects/${project.id}`, {

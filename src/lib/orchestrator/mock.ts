@@ -39,34 +39,48 @@ export function createMockProject({
   const id = randomUUID();
   const normalizedIdea = idea.trim();
   const headline = normalizedIdea.length > 0 ? normalizedIdea : "Describe la visión de la misión";
+  const lowerHeadline = headline.toLowerCase();
+  const shortTagline = headline.length > 72 ? `${headline.slice(0, 69)}…` : headline;
+  const highLevelConcept = `Vector · ${shortTagline}`;
+
+  const problemStatement = `Equipos que quieren ${lowerHeadline} se pierden en la traducción entre visión y ejecución.`;
+  const solutionStatement = `Vector arma en minutos el plan maestro para ${lowerHeadline}, alineando estrategia, roadmap, pitch y experimentos en un solo workspace.`;
+  const uvpStatement = `A diferencia de documentos estáticos, Vector orquesta agentes que actualizan ${lowerHeadline} en tiempo real y empujan la siguiente acción validable.`;
+  const metricsStatement = `Tiempo hasta acción < 10 min · Experimentos lanzados/semana · Momentum del proyecto basado en evidencia.`;
+  const channelsStatement = `Comunidades fundadoras · Alianzas con aceleradoras · Contenido "behind the build" mostrando cómo Vector ejecuta ${lowerHeadline}.`;
+  const unfair = `Plantillas vivas conectadas a integraciones y un coach anti-parálisis con contexto completo de ${lowerHeadline}.`;
+  const earlyAdopters = `Founders pre-incubación obsesionados con ${lowerHeadline}, labs de innovación y consultores estratégicos.`;
+  const revenueStatement = `Suscripción Vector Pro · Playbooks premium enfocados en ${lowerHeadline} · Consultoría para cohorts que necesitan velocidad.`;
+  const costStatement = `Infraestructura LLM, orquestación de agentes dedicados a ${lowerHeadline} y soporte estratégico.`;
 
   return {
     id,
-    playbookId: "mock-startup-playbook",
+    playbookId: "vector-demo-playbook",
     projectType,
     idea,
-    provider: "google",
+    provider: "vector-demo",
     createdAt: now,
     updatedAt: now,
     userId,
     artifacts: {
       leanCanvas: {
-        problem: `Dolor central: ${headline}`,
-        customerSegments: "Segmento que más sufre el problema",
-        existingAlternatives: "Soluciones actuales y sus límites",
-        solution: "Propuesta del proyecto",
-        uniqueValueProposition: "Promesa diferenciadora",
-        unfairAdvantage: "Ventaja difícil de copiar",
-        keyMetrics: "Indicadores clave para medir progreso",
-        channels: "Canales prioritarios de adquisición",
-        costStructure: "Costos principales de la operación",
-        revenueStreams: "Cómo se capturará valor",
-        earlyAdopters: "Perfil de early adopters",
-        highLevelConcept: "Analogía simple que explica la propuesta",
+        problem: problemStatement,
+        customerSegments: `Founders y equipos que lanzan ${lowerHeadline} sin una guía clara en day cero.`,
+        existingAlternatives:
+          "Docs dispersos, plantillas en Notion y sesiones eternas sin decisiones claras.",
+        solution: solutionStatement,
+        uniqueValueProposition: uvpStatement,
+        unfairAdvantage: unfair,
+        keyMetrics: metricsStatement,
+        channels: channelsStatement,
+        costStructure: costStatement,
+        revenueStreams: revenueStatement,
+        earlyAdopters: earlyAdopters,
+        highLevelConcept,
       },
       roadmap: {
-        summary: "Roadmap generado en modo demostración.",
-        markdown: `## Fase 1 - Descubrimiento\n- Validar hipótesis iniciales\n\n## Fase 2 - MVP\n- Lanzar versión funcional con propuesta central\n\n## Fase 3 - Escala\n- Optimizar métricas y crecer en adquisición`,
+        summary: `Vector divide ${headline} en tres misiones: descubrir verdad de usuarios, lanzar MVP significativo y escalar aprendizaje continuo.`,
+        markdown: `## Fase 1 · Fundamento Estratégico\n- Entrevistar 10 líderes sobre ${lowerHeadline}\n- Mapear jobs-to-be-done y riesgos principales\n- Definir métricas de validación inicial\n\n## Fase 2 · MVP Orquestado\n- Diseñar experiencia mínima que entregue el core de ${lowerHeadline}\n- Activar playbooks de GTM con 3 canales priorizados\n- Integrar feedback loops semanales con Vector\n\n## Fase 3 · Escala y Momentum\n- Automatizar experimentos recurrentes\n- Integrar equipos externos (ventas/marketing) con el workspace Vector\n- Preparar narrativa de fundraising enfocada en ${headline}`,
         phases: [
           {
             name: "Fase 1 - Descubrimiento",
@@ -95,9 +109,9 @@ export function createMockProject({
         ],
       },
       pitch: {
-        elevatorPitch: `Estamos creando una plataforma para ${headline.toLowerCase()} con una experiencia guiada end-to-end.`,
+        elevatorPitch: `Estamos creando ${headline} en 60 segundos: Vector toma la idea, la traduce en estrategia y te empuja a validar en el mundo real antes de escribir una línea de código.`,
         positioningStatement:
-          "Para equipos que necesitan lanzar con claridad, Vector entrega un playbook accionable coordinando agentes especializados automáticamente.",
+          `Para equipos que quieren ${lowerHeadline} sin parálisis, Vector es el copiloto que orquesta agentes estratégicos y entrega misiones accionables. A diferencia de gestores tradicionales, se enfoca en la primera validación real.`,
         deckOutline: [
           "Problema",
           "Oportunidad",
@@ -111,27 +125,27 @@ export function createMockProject({
           "Cierre",
         ],
         investorHighlights: [
-          "Vertical en crecimiento impulsado por automatización",
-          "Cadena multi-agente reduce tiempo a ejecución",
-          "Equipo con experiencia operativa",
+          `Mercado preparado: founders buscando claridad para ${lowerHeadline}.`,
+          "Cadena multi-agente reduce tiempo hasta la acción a minutos.",
+          "Playbooks y partnerships con aceleradoras crean moats de distribución.",
         ],
       },
       empathy: {
         interviewQuestions: [
-          "¿Qué intentas resolver actualmente y cómo lo haces?",
-          "¿Qué sucede si no solucionas este problema a tiempo?",
-          "¿Qué resultado te haría sentir que valió la pena?",
+          `¿Cuándo intentaste lanzar ${lowerHeadline} por última vez y qué te bloqueó?`,
+          "¿Cómo mides si una experimentación temprana valió la pena?",
+          "¿Qué tendría que pasar para confiar en un copiloto que te empuja fuera del plan?",
         ],
         assumptionsToValidate: [
-          "El problema es prioritario",
-          "Los early adopters valoran automatización",
-          "Existe disposición a pagar por velocidad y foco",
+          `Los equipos priorizan resolver ${lowerHeadline} durante las primeras semanas.`,
+          "La claridad estratégica es la fricción principal sobre la ejecución técnica.",
+          "Disposición a pagar por acompañamiento continuo y playbooks accionables.",
         ],
-        personas: ["Founder early-stage", "Líder de innovación"],
+        personas: ["Founder early-stage", "Líder de innovación", "Consultor estratégico"],
         successSignals: [
-          "Compromiso para pilotos",
-          "Enfoque en métricas accionables",
-          "Referencias a procesos manuales actuales",
+          "Compromiso para pilotos con entrevistas programadas",
+          "Uso recurrente del workspace como fuente única de verdad",
+          "Recomendaciones orgánicas del playbook a otros equipos",
         ],
       },
     },
@@ -140,7 +154,7 @@ export function createMockProject({
         id: "idea",
         label: "Analizando idea",
         status: "success",
-        description: "Validación rápida completada (modo demo)",
+        description: `Vector interpretó las intenciones detrás de “${shortTagline}”.`,
         startedAt: now,
         finishedAt: now,
       },
@@ -148,7 +162,7 @@ export function createMockProject({
         id: "anchor",
         label: "Lean Canvas",
         status: "success",
-        description: "Playbook simulado",
+        description: "Hipótesis estratégicas mapeadas y priorizadas.",
         startedAt: now,
         finishedAt: now,
       },
@@ -156,7 +170,7 @@ export function createMockProject({
         id: "roadmap",
         label: "Roadmap",
         status: "success",
-        description: "Secuencia estratégica generada",
+        description: "Fases y métricas listas para ejecución.",
         startedAt: now,
         finishedAt: now,
       },
@@ -164,7 +178,7 @@ export function createMockProject({
         id: "pitch",
         label: "Pitch",
         status: "success",
-        description: "Narrativa lista",
+        description: "Historia lista para inversionistas y aliados.",
         startedAt: now,
         finishedAt: now,
       },
@@ -172,7 +186,7 @@ export function createMockProject({
         id: "empathy",
         label: "Discovery",
         status: "success",
-        description: "Guía de validación creada",
+        description: "Experimentos de validación listos para salir a la calle.",
         startedAt: now,
         finishedAt: now,
       },

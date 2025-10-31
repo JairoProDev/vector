@@ -99,6 +99,9 @@ export function NewProjectForm() {
   const timersRef = useRef<number[]>([]);
   const [infoPanel, setInfoPanel] = useState<"telemetry" | "manual">("telemetry");
 
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  const progressStepMs = isDemoMode ? 280 : 1200;
+
   useEffect(() => {
     return () => {
       timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -125,7 +128,7 @@ export function NewProjectForm() {
             return status;
           }),
         );
-      }, (index + 1) * 1200);
+      }, (index + 1) * progressStepMs);
 
       return timeoutId;
     });
@@ -179,7 +182,10 @@ export function NewProjectForm() {
         }),
       );
 
-      router.push(`/project/${data.project.id}`);
+      const redirectDelay = isDemoMode ? progressStepMs : 350;
+      window.setTimeout(() => {
+        router.push(`/project/${data.project.id}`);
+      }, redirectDelay);
     } catch (err) {
       console.error(err);
       stopProgressAnimation();

@@ -80,7 +80,7 @@ export interface ProjectPayload {
   idea: string;
   artifacts: ProjectArtifacts;
   orchestratorLog: OrchestratorStepLog[];
-  provider: "openai" | "anthropic" | "google";
+  provider: "openai" | "anthropic" | "google" | "vector-demo";
   createdAt: string;
   updatedAt: string;
   userId?: string | null;
