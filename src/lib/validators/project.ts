@@ -1,5 +1,46 @@
 import { z } from "zod";
 
+const stringArray = () =>
+  z.preprocess((value) => {
+    if (value === undefined || value === null) {
+      return [];
+    }
+
+    if (!Array.isArray(value)) {
+      return value;
+    }
+
+    return value.map((item) => {
+      if (typeof item === "string") return item;
+      if (typeof item === "number" || typeof item === "boolean") {
+        return String(item);
+      }
+      if (Array.isArray(item)) {
+        return item
+          .map((subItem) =>
+            typeof subItem === "string" ? subItem : JSON.stringify(subItem),
+          )
+          .join(" · ");
+      }
+      if (item && typeof item === "object") {
+        const record = item as Record<string, unknown>;
+        if (typeof record.name === "string") {
+          return record.name;
+        }
+        const flat = Object.values(record)
+          .filter((val) => val !== undefined && val !== null)
+          .map((val) =>
+            typeof val === "string" || typeof val === "number"
+              ? String(val)
+              : JSON.stringify(val),
+          )
+          .join(" - ");
+        return flat || JSON.stringify(record);
+      }
+      return "";
+    });
+  }, z.array(z.string()));
+
 export const generateProjectSchema = z.object({
   idea: z
     .string()
@@ -28,10 +69,10 @@ export const leanCanvasSchema = z.object({
 export const roadmapPhaseSchema = z.object({
   name: z.string(),
   focus: z.string().default(""),
-  objectives: z.array(z.string()).default([]),
-  keyInitiatives: z.array(z.string()).default([]),
-  successMetrics: z.array(z.string()).default([]),
-  risks: z.array(z.string()).optional().default([]),
+  objectives: stringArray(),
+  keyInitiatives: stringArray(),
+  successMetrics: stringArray(),
+  risks: stringArray(),
 });
 
 export const roadmapSchema = z.object({
@@ -43,15 +84,15 @@ export const roadmapSchema = z.object({
 export const pitchSchema = z.object({
   elevatorPitch: z.string().default(""),
   positioningStatement: z.string().default(""),
-  deckOutline: z.array(z.string()).default([]),
-  investorHighlights: z.array(z.string()).default([]),
+  deckOutline: stringArray(),
+  investorHighlights: stringArray(),
 });
 
 export const empathySchema = z.object({
-  interviewQuestions: z.array(z.string()).default([]),
-  assumptionsToValidate: z.array(z.string()).default([]),
-  personas: z.array(z.string()).optional().default([]),
-  successSignals: z.array(z.string()).optional().default([]),
+  interviewQuestions: stringArray(),
+  assumptionsToValidate: stringArray(),
+  personas: stringArray(),
+  successSignals: stringArray(),
 });
 
 export const projectArtifactsSchema = z.object({

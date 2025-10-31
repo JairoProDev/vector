@@ -64,7 +64,7 @@ export function resolveModelName(provider: LLMProvider, override?: string) {
     case "anthropic":
       return env.DEFAULT_ANTHROPIC_MODEL ?? "claude-3-5-sonnet-latest";
     case "google":
-      return env.DEFAULT_GOOGLE_MODEL ?? "gemini-1.5-pro-latest";
+      return env.DEFAULT_GOOGLE_MODEL ?? "gemini-2.0-flash";
     default:
       return "gpt-4o-mini";
   }

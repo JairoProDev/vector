@@ -6,11 +6,31 @@ import {
   roadmapSchema,
 } from "@/lib/validators/project";
 import type { Playbook } from "@/lib/orchestrator/types";
+import { jsonrepair } from "jsonrepair";
 import { z } from "zod";
 
 const jsonParser = <T>(schema: z.ZodType<T>) => (raw: string) => {
-  const parsed = JSON.parse(raw);
-  return schema.parse(parsed);
+  try {
+    const parsed = JSON.parse(raw);
+    return schema.parse(parsed);
+  } catch (error) {
+    try {
+      const repairedJson = jsonrepair(raw);
+      if (process.env.NODE_ENV === "development") {
+        console.warn("♻️ LLM JSON repaired", {
+          originalLength: raw.length,
+          repairedLength: repairedJson.length,
+        });
+      }
+      const parsed = JSON.parse(repairedJson);
+      return schema.parse(parsed);
+    } catch (repairError) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("❌ Failed to repair LLM JSON", repairError);
+      }
+      throw repairError;
+    }
+  }
 };
 
 export const startupPlaybook: Playbook = {
@@ -19,8 +39,8 @@ export const startupPlaybook: Playbook = {
   description:
     "Playbook enfocado en founders en etapa inicial. Ancla en Lean Canvas, luego genera roadmap, pitch y guías de validación.",
   projectTypes: ["startup"],
-  defaultProvider: "openai",
-  defaultModel: "gpt-4o-mini",
+  defaultProvider: "google",
+  defaultModel: "gemini-2.0-flash",
   agents: [
     {
       id: "anchor",
@@ -31,26 +51,13 @@ export const startupPlaybook: Playbook = {
       run: async ({ context, provider, model }) => {
         const { idea, projectType } = context;
         const prompt = `Eres un consultor senior de Lean Startup. Toma la siguiente idea y genera un Lean Canvas completo.
+
 IDEA DEL PROYECTO (${projectType}): ${idea}
 
 INSTRUCCIONES DE FORMATO:
-- Responde SOLO con un objeto JSON válido.
-- No incluyas texto fuera del JSON ni bloques de código.
-- Usa este esquema exacto (todas las propiedades con cadenas de texto):
-{
-  "problem": string,
-  "customerSegments": string,
-  "existingAlternatives": string,
-  "solution": string,
-  "uniqueValueProposition": string,
-  "unfairAdvantage": string,
-  "keyMetrics": string,
-  "channels": string,
-  "costStructure": string,
-  "revenueStreams": string,
-  "earlyAdopters": string,
-  "highLevelConcept": string
-}
+Responde ÚNICAMENTE con un objeto JSON válido, sin texto adicional ni marcado. Usa este esquema exacto:
+
+{"problem": "texto", "customerSegments": "texto", "existingAlternatives": "texto", "solution": "texto", "uniqueValueProposition": "texto", "unfairAdvantage": "texto", "keyMetrics": "texto", "channels": "texto", "costStructure": "texto", "revenueStreams": "texto", "earlyAdopters": "texto", "highLevelConcept": "texto"}
 
 CRITERIOS:
 - Sé conciso pero accionable.
@@ -89,34 +96,42 @@ CRITERIOS:
 LEAN CANVAS:
 ${JSON.stringify(leanCanvas, null, 2)}
 
-RESPONDE SOLO CON UN OBJETO JSON usando el siguiente esquema:
+RESPONDE SOLO CON UN OBJETO JSON usando este esquema exacto:
 {
-  "summary": string, // narrativa general del camino
-  "markdown": string, // roadmap completo en Markdown con encabezados, listas y métricas
+  "summary": "string",
+  "markdown": "string",
   "phases": [
     {
       "name": "Fase 1 - MVP",
-      "focus": string,
-      "objectives": string[],
-      "keyInitiatives": string[],
-      "successMetrics": string[],
-      "risks": string[]
+      "focus": "string",
+      "objectives": ["string"],
+      "keyInitiatives": ["string"],
+      "successMetrics": ["string"],
+      "risks": ["string"]
     },
     {
       "name": "Fase 2 - Versión 1",
-      ...
+      "focus": "string",
+      "objectives": ["string"],
+      "keyInitiatives": ["string"],
+      "successMetrics": ["string"],
+      "risks": ["string"]
     },
     {
       "name": "Fase 3 - Escala",
-      ...
+      "focus": "string",
+      "objectives": ["string"],
+      "keyInitiatives": ["string"],
+      "successMetrics": ["string"],
+      "risks": ["string"]
     }
   ]
 }
 
-INSTRUCCIONES:
+INSTRUCCIONES ADICIONALES:
 - Define entregables claros y medibles.
 - Las métricas deben ser cuantificables.
-- Markdown debe incluir títulos para cada fase (##) y listas de bullets.`;
+- El campo "markdown" debe contener el roadmap completo en formato Markdown con encabezados (##) y listas.`;
 
         const response = await callStructuredLLM({
           prompt,
@@ -150,18 +165,19 @@ INSTRUCCIONES:
 LEAN CANVAS:
 ${JSON.stringify(leanCanvas, null, 2)}
 
-ENTREGA UN JSON con el siguiente formato:
+RESPONDE ÚNICAMENTE CON UN JSON de este esquema:
 {
-  "elevatorPitch": string, // 3-4 frases persuasivas
-  "positioningStatement": string, // frase estilo "Para X que..."
-  "deckOutline": string[], // títulos de 10 slides
-  "investorHighlights": string[] // bullets con datos clave para inversionistas
+  "elevatorPitch": "string",
+  "positioningStatement": "string",
+  "deckOutline": ["string"],
+  "investorHighlights": ["string"]
 }
 
-TONO:
-- Confiado pero realista.
-- Destaca tracción potencial y visión.
-- No inventes métricas que no estén respaldadas por el canvas.`;
+INSTRUCCIONES ADICIONALES:
+- El elevator pitch debe tener 3 a 4 frases persuasivas.
+- La positioning statement sigue el formato "Para [segmento] que [necesidad]...".
+- "deckOutline" debe contener exactamente 10 títulos de diapositiva.
+- "investorHighlights" incluye bullets con datos clave verificables.`;
 
         const response = await callStructuredLLM({
           prompt,

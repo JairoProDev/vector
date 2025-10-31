@@ -63,6 +63,7 @@ export async function callStructuredLLM<T>({
   timeoutMs = 60000,
 }: StructuredLLMOptions<T>) {
   let lastError: unknown;
+  let lastRawText: string | undefined;
 
   for (let attempt = 0; attempt <= retryCount; attempt += 1) {
     try {
@@ -76,6 +77,7 @@ export async function callStructuredLLM<T>({
           timeoutMs,
         });
 
+      lastRawText = text;
       const cleaned = extractJsonPayload(text);
       const parsed = parser(cleaned);
       return {
@@ -86,7 +88,20 @@ export async function callStructuredLLM<T>({
         attempt,
       };
     } catch (error) {
-      lastError = error;
+      if (process.env.NODE_ENV === "development" && lastRawText) {
+        console.error("⚠️ LLM structured call failed", {
+          error,
+          snippet: lastRawText.substring(0, 400),
+        });
+      }
+
+      if (error instanceof Error && lastRawText) {
+        lastError = new Error(
+          `${error.message} | Raw snippet: ${lastRawText.substring(0, 400)}`,
+        );
+      } else {
+        lastError = error;
+      }
     }
   }
 
@@ -95,12 +110,21 @@ export async function callStructuredLLM<T>({
 
 function extractJsonPayload(text: string) {
   const trimmed = text.trim();
+  
+  // Try direct JSON first
   if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
     return trimmed;
   }
 
-  const match = trimmed.match(/\{[\s\S]*\}/);
-  if (match) {
+  // Try to extract JSON from code blocks (```json or ```)
+  const codeBlockMatch = trimmed.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/i);
+  if (codeBlockMatch && codeBlockMatch[1]) {
+    return codeBlockMatch[1].trim();
+  }
+
+  // Try to find JSON object anywhere in the text (non-greedy with dotall)
+  const match = trimmed.match(/\{[\s\S]*?\}/);
+  if (match && match[0]) {
     return match[0];
   }
 
