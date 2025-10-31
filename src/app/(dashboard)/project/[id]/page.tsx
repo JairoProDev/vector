@@ -22,9 +22,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     const mockProject = getMockProject(params.id);
     if (!mockProject) {
       notFound();
+      return null; // TypeScript hint (unreachable)
     }
     if (!canAccessProject(session?.user?.id, mockProject.userId ?? null)) {
       notFound();
+      return null; // TypeScript hint (unreachable)
     }
     return <ProjectWorkspace project={mockProject} />;
   }
