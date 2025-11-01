@@ -168,13 +168,6 @@ export function NewProjectForm() {
       const data = (await response.json()) as { project: ProjectPayload };
       stopProgressAnimation();
 
-      // HACKATHON MODE: Save to localStorage for persistence in serverless environment
-      try {
-        localStorage.setItem(`vector_project_${data.project.id}`, JSON.stringify(data.project));
-      } catch (err) {
-        console.warn("Failed to save to localStorage", err);
-      }
-
       const logMap = new Map(
         data.project.orchestratorLog.map((entry) => [entry.id, entry.status]),
       );

@@ -39,18 +39,62 @@ export async function POST(request: Request) {
     const json = await request.json();
     const body = generateProjectSchema.parse(json);
 
-    // HACKATHON MODE: Always use mock, never fail
-    // Simulate a realistic delay of 3-5 seconds to make it look like real AI processing
-    const delay = 3000 + Math.random() * 2000; // Random between 3000-5000ms
-    await new Promise(resolve => setTimeout(resolve, delay));
+    const session = await getAuthSession();
+    const useMock = shouldUseMockOrchestrator();
 
-    const session = await getAuthSession().catch(() => null);
+    if (useMock) {
+      console.info("[Vector] Using mock orchestrator (demo mode)");
+      return buildMockResponse(
+        body,
+        session?.user?.id ?? null,
+        "demo",
+      );
+    }
 
-    return buildMockResponse(
-      body,
-      session?.user?.id ?? null,
-      "demo-forced",
-    );
+    // Real orchestration with LLMs and database
+    try {
+      await connectToDatabase();
+
+      console.info("[Vector] Starting real orchestration", {
+        idea: body.idea.substring(0, 50),
+        projectType: body.projectType,
+        provider: body.llmProvider,
+      });
+
+      const orchestratorResult = await runOrchestrator({
+        idea: body.idea,
+        projectType: body.projectType,
+        provider: body.llmProvider,
+        anchorModel: body.anchorModel,
+      });
+
+      const project = await ProjectModel.create({
+        idea: body.idea,
+        projectType: body.projectType,
+        playbookId: orchestratorResult.playbookId,
+        provider: orchestratorResult.provider,
+        userId: session?.user?.id ?? null,
+        artifacts: orchestratorResult.artifacts,
+        orchestratorLog: orchestratorResult.log,
+      });
+
+      console.info("[Vector] ✅ Project created successfully", {
+        projectId: project._id,
+        provider: orchestratorResult.provider,
+      });
+
+      return NextResponse.json(
+        {
+          project: toProjectPayload(project),
+          mode: "production",
+        },
+        { status: 201 },
+      );
+    } catch (error) {
+      console.error("[Vector] ❌ Orchestrator failed, falling back to demo", error);
+      // Fallback to demo mode on error
+      return buildMockResponse(body, session?.user?.id ?? null, "demo-fallback");
+    }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

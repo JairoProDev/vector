@@ -19,8 +19,12 @@ export function hasConfiguredLLMProvider() {
 }
 
 export function shouldUseMockOrchestrator() {
-  // HACKATHON MODE: ALWAYS USE MOCK - Never fail, just simulate everything
-  return true;
+  // Use mock only when LLM providers or database are not configured
+  if (process.env.VECTOR_FORCE_DEMO === "true") return true;
+  if (process.env.VECTOR_USE_MOCK_ORCHESTRATOR === "true") return true;
+  if (!env.MONGODB_URI) return true;
+  if (!hasConfiguredLLMProvider()) return true;
+  return false;
 }
 
 export function createMockProject({

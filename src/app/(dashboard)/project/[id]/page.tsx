@@ -1,17 +1,52 @@
-import dynamic from "next/dynamic";
+import { notFound } from "next/navigation";
 
-// HACKATHON MODE: Disable SSR completely to use localStorage
-const ProjectWorkspaceClient = dynamic(
-  () => import("@/components/project/project-workspace-client").then((mod) => mod.ProjectWorkspaceClient),
-  { ssr: false }
-);
+import { ProjectWorkspace } from "@/components/project/project-workspace";
+import { getAuthSession } from "@/lib/auth";
+import { connectToDatabase } from "@/lib/db";
+import { ProjectModel } from "@/lib/models/project";
+import { getMockProject, shouldUseMockOrchestrator } from "@/lib/orchestrator/mock";
+import { toProjectPayload } from "@/lib/serializers/project";
 
 interface ProjectPageProps {
   params: { id: string };
 }
 
-export default function ProjectPage({ params }: ProjectPageProps) {
-  return <ProjectWorkspaceClient projectId={params.id} />;
+export default async function ProjectPage({ params }: ProjectPageProps) {
+  const session = await getAuthSession();
+  const useMock = shouldUseMockOrchestrator();
+
+  if (useMock) {
+    const mockProject = getMockProject(params.id);
+    if (!mockProject) {
+      notFound();
+    }
+    if (!canAccessProject(session?.user?.id, mockProject.userId ?? null)) {
+      notFound();
+    }
+    return <ProjectWorkspace project={mockProject} />;
+  }
+
+  // Real database query
+  await connectToDatabase();
+  const projectDoc = await ProjectModel.findById(params.id);
+
+  if (!projectDoc) {
+    notFound();
+  }
+
+  if (!canAccessProject(session?.user?.id, projectDoc.userId)) {
+    notFound();
+  }
+
+  const project = toProjectPayload(projectDoc);
+
+  return <ProjectWorkspace project={project} />;
+}
+
+function canAccessProject(userId?: string, projectUserId?: string | null) {
+  if (!projectUserId) return true;
+  if (!userId) return false;
+  return userId === projectUserId;
 }
 
 
